@@ -2,6 +2,7 @@ package com.bway.BroadwayProject.controller;
 
 import com.bway.BroadwayProject.model.Category;
 import com.bway.BroadwayProject.service.CategoryServiceImpl;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,7 +18,10 @@ public class CategoryController {
     @Autowired
     private CategoryServiceImpl catService;
     @GetMapping("/admin/categories")
-    public String getCategory(Model model, @ModelAttribute Category category){
+    public String getCategory(Model model, @ModelAttribute Category category, HttpSession session){
+        if(session.getAttribute("validAdmin")==null){
+            return "adminLogin";
+        }
 
         model.addAttribute("categories", catService.getAllCategory());
 
@@ -25,14 +29,21 @@ public class CategoryController {
     }
 
     @GetMapping("/admin/categories/add")
-    public String getAddCategory(Model model){
+    public String getAddCategory(Model model, HttpSession session){
+        if(session.getAttribute("validAdmin")==null){
+            return "adminLogin";
+        }
         //sending an empty object to the view
         model.addAttribute("category", new Category());
         return "categoriesAdd";
     }
 
     @PostMapping("/admin/categories/add")
-    public String addCategory(@ModelAttribute Category category){
+    public String addCategory(@ModelAttribute Category category, HttpSession session){
+
+        if(session.getAttribute("validAdmin")==null){
+            return "adminLogin";
+        }
 
         catService.addCategory(category);
 

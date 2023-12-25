@@ -4,7 +4,9 @@ import com.bway.BroadwayProject.dto.ProductDTO;
 import com.bway.BroadwayProject.model.Product;
 import com.bway.BroadwayProject.service.CategoryServiceImpl;
 import com.bway.BroadwayProject.service.ProductServiceImpl;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -25,14 +27,20 @@ public class ProductController {
 
     //gets products list
     @GetMapping("/admin/products")
-    public String getProducts(Model model){
+    public String getProducts(Model model, HttpSession session){
+        if(session.getAttribute("validAdmin")==null){
+            return "adminLogin";
+        }
         model.addAttribute("products", prodService.getAllProduct());
         return "products";
     }
 
     //gets products adding page
     @GetMapping("/admin/products/add")
-    public String getAddProduct(Model model){
+    public String getAddProduct(Model model, HttpSession session){
+        if(session.getAttribute("validAdmin")==null){
+            return "adminLogin";
+        }
         model.addAttribute("productDTO", new ProductDTO());
         model.addAttribute("categories", catService.getAllCategory());
         return "productsAdd";
@@ -72,7 +80,10 @@ public class ProductController {
     }
 
     @GetMapping("/admin/product/delete/{id}")
-    public String delProduct(@PathVariable Long id){
+    public String delProduct(@PathVariable Long id, HttpSession session){
+        if(session.getAttribute("validAdmin")==null){
+            return "adminLogin";
+        }
 
         prodService.delProduct(id);
 
@@ -80,7 +91,10 @@ public class ProductController {
     }
 
     @GetMapping("/admin/product/update/{id}")
-    public String updateProducts(Model model, @PathVariable Long id){
+    public String updateProducts(Model model, @PathVariable Long id, HttpSession session){
+        if(session.getAttribute("validAdmin")==null){
+            return "adminLogin";
+        }
         Product product = prodService.getProduct(id).get();
         ProductDTO productDTO = new ProductDTO();
         productDTO.setId(product.getId());
@@ -95,8 +109,6 @@ public class ProductController {
         model.addAttribute("categories", catService.getAllCategory());
 
         return "productsAdd";
-
-
 
     }
 }

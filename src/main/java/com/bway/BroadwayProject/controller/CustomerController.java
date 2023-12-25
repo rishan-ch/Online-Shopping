@@ -4,6 +4,7 @@ import com.bway.BroadwayProject.model.Cart;
 import com.bway.BroadwayProject.model.Product;
 import com.bway.BroadwayProject.service.CategoryServiceImpl;
 import com.bway.BroadwayProject.service.ProductServiceImpl;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,7 +21,10 @@ public class CustomerController {
 
 
     @GetMapping("/home")
-    public String getHome(Model model){
+    public String getHome(Model model, HttpSession session){
+        if(session.getAttribute("validUser")==null){
+            return "login";
+        }
         model.addAttribute("cartCount",Cart.cart.size());
         return "home";
     }
@@ -28,7 +32,10 @@ public class CustomerController {
 
     //get product lists
     @GetMapping("/shop")
-    public String getShop(Model model){
+    public String getShop(Model model, HttpSession session){
+        if(session.getAttribute("validUser")==null){
+            return "login";
+        }
         model.addAttribute("cartCount",Cart.cart.size());
         model.addAttribute("categories",catService.getAllCategory());
         model.addAttribute("products",prodService.getAllProduct());
@@ -37,7 +44,10 @@ public class CustomerController {
 
     //get products by category
     @GetMapping("/shop/category/{id}")
-    public String getProductByCategory(Model model, @PathVariable int id){
+    public String getProductByCategory(Model model, @PathVariable int id,HttpSession session){
+        if(session.getAttribute("validUser")==null){
+            return "login";
+        }
         model.addAttribute("categories",catService.getAllCategory());
         model.addAttribute("products",prodService.getAllProductByCategoryId(id));
         return "shop";
@@ -45,7 +55,10 @@ public class CustomerController {
 
     //view products
     @GetMapping("/shop/viewproduct/{id}")
-    public String getViewProduct(Model model, @PathVariable Long id){
+    public String getViewProduct(Model model, @PathVariable Long id,HttpSession session){
+        if(session.getAttribute("validUser")==null){
+            return "login";
+        }
         model.addAttribute("product",prodService.getProduct(id).get());
         model.addAttribute("cartCount",Cart.cart.size());
         return "viewProduct";
@@ -53,14 +66,20 @@ public class CustomerController {
 
     //add to cart
     @GetMapping("/addToCart/{id}")
-    public String addToCart(@PathVariable long id){
+    public String addToCart(@PathVariable long id, HttpSession session){
+        if(session.getAttribute("validUser")==null){
+            return "login";
+        }
         Cart.cart.add(prodService.getProduct(id).get());
 
         return "redirect:/shop";
     }
 
     @GetMapping("/cart")
-    public String getCart(Model model){
+    public String getCart(Model model, HttpSession session){
+        if(session.getAttribute("validUser")==null){
+            return "login";
+        }
         model.addAttribute("cartCount",Cart.cart.size());
         model.addAttribute("total", Cart.cart.stream().mapToDouble(Product::getPrice).sum());
         model.addAttribute("cart", Cart.cart);
@@ -80,9 +99,6 @@ public class CustomerController {
         return "redirect:/shop";
     }
 
-    @GetMapping("/logout")
-    public String getUserLogout(){
-        return "login";
-    }
+
 
 }
